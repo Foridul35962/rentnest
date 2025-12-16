@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const tempSchema = new mongoose.Schema({
     userName: {
         type: String,
         required: true,
-        unique: true
+        // unique: true
     },
     fullName: {
         type: String,
@@ -13,7 +14,6 @@ const tempSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
     },
     password: {
         type: String,
@@ -25,24 +25,26 @@ const tempSchema = new mongoose.Schema({
         required: true,
         default: 'guest'
     },
-    otp: {
-        type: String,
-        required: true
-    },
-    expiredOtp:{
-        type: Date,
-        required: true
-    },
-    isVerified:{
-        type: Boolean,
-        default: false
-    },
-    createdAt:{
-        type: Date,
-        default: Date.now,
-        expires: 600
+    otpCode: {
+    type: String,
+    required: true,
+  },
+  expiredOtp: {
+    type: Date,
+    required: true,
+    index: { expires: 0 }, // TTL index to auto-delete document after expiration
+  }
+}, {timestamps: true, versionKey: false })
+
+
+tempSchema.pre('save', async function () {
+    if (!this.isModified('password')) {
+        return
     }
-}, {timestamps: true})
+
+    this.password = await bcrypt.hash(this.password, 12)
+})
+
 
 const TempUser = mongoose.model('TempUser', tempSchema)
 
