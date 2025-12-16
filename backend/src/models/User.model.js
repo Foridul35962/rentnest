@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
     },
     refreshToken: {
         type: String
+    }
     },
     isVerified:{
         type: Boolean,
@@ -42,13 +43,13 @@ const userSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 //hash password in save time
-userSchema.pre('save', async function () {
-    if (!this.isModified('password')) {
-        return
-    }
+// userSchema.pre('save', async function () {
+//     if (!this.isModified('password')) {
+//         return
+//     }
 
-    this.password = await bcrypt.hash(this.password, 12)
-})
+//     this.password = await bcrypt.hash(this.password, 12)
+// })
 
 //check correct password
 userSchema.methods.isPasswordCorrect = async function (password) {
